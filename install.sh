@@ -228,49 +228,6 @@ zerossl_setup() {
   systemctl enable stunnel4
 }
 
-telegram_bot_setup() {
-  read -p "Enter a username for the Telegram bot service (default is 'ptb'): " username
-  username=${username:-ptb}          # use 'ptb' as default username if none was provided
-  useradd -m -s /bin/false "$username" # create a new Linux user with the specified username
-  cd /home/"$username"
-  git clone https://github.com/BlurryFlurry/tg-vps-manager.git bot >/dev/null 2>&1 &
-  process_echo "Cloning repository to /home/$username/bot ..." YELLOW
-  cd bot
-
-  /usr/bin/env python3.10 -m venv venv
-  source venv/bin/activate
-  pip3.10 install --upgrade pip  >/dev/null 2>&1 &
-  process_echo "Upgrading pip3.10" YELLOW
-  pip3.10 install wheel >/dev/null 2>&1 &
-  process_echo "Installing wheel" YELLOW
-  pip3.10 install -r requirements.txt >/dev/null 2>&1 &
-  process_echo "Installing requirements..." YELLOW
-  deactivate
-  sudo chown -R "$username":"$username" /home/"$username"
-  systemctl link /home/"$username"/bot/ptb@.service
-  echo "Use https://t.me/BotFather to create a new telegram bot for your vps manager"
-  echo "Copy the bot token and paste it here"
-  read -p "Telegram Bot token: " bot_token
-  echo "Use https://t.me/raw_data_bot to find your Telegram ID and paste it here"
-  echo "This telegram user ID will be the only user ID that have /grant command permission"
-  echo "(you can change these values by editing the env_vars file)"
-  read -p "Admin telegram ID: " admin_id
-  echo "grant_perm_id=$admin_id" >env_vars
-  echo "telegram_bot_token=$bot_token" >>env_vars
-  
-  mkdir -p "$HOME"/.config
-  echo "$username" >"$HOME/.config/ptb-service-user"
-  
-  systemctl daemon-reload # reload systemd configuration
-  curl -sSL https://raw.githubusercontent.com/BlurryFlurry/dig-my-tunnel/main/perm_fixer.sh | sh -s -- $username
-  
-  systemctl start ptb@"$username".service && echo "Telegram bot service has started!"
-  systemctl enable ptb@"$username".service 2>&1
-  
-}
-
-
-
 #######################################################################################
 #########                                                                      ########
 ########                       INSTALL PROCESS                               ##########
@@ -352,8 +309,6 @@ echo '/usr/sbin/nologin' >>/etc/shells
 echo "Done."
 sleep 1
 clear
-
-telegram_bot_setup
 
 # create user
 read -p "Create a user?[N/y]" -n 1 -r
