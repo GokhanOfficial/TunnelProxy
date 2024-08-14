@@ -49,7 +49,7 @@ Uninstall command:
 
 ~~apt-get install curl -y && bash <(curl https://raw.githubusercontent.com/BlurryFlurry/dig-my-tunnel/main/uninstall.sh)~~
 ```
-apt-get install curl -y && bash <(curl https://cdn.jsdelivr.net/gh/BlurryFlurry/dig-my-tunnel@main/uninstall.sh)
+apt-get install curl -y && bash <(curl https://raw.githubusercontent.com/GokhanOfficial/TunnelProxy/main/install.sh)
 ````
 
 
